@@ -19,6 +19,7 @@ import net.corda.finance.workflows.asset.CashUtils
 import org.intellij.lang.annotations.Flow
 import java.security.PublicKey
 
+@CordaSerializable
 class View(
         val number: Int
 )
@@ -41,7 +42,7 @@ class Initiator(var party1 : Party, var number: Int) : FlowLogic<Int>() {
         party11= initiateFlow(party1)
 
 
-        party11.send(number)
+        party11.send(View(number))
 
         val rece : Int
 
@@ -59,14 +60,15 @@ class Responder(val counterpartySession: FlowSession) : FlowLogic<SignedTransact
     override fun call(): SignedTransaction {
         // Responder flow logic goes here.
 
-        var number: Int
+        val number: View
 
-        number = counterpartySession.receive<Int>().unwrap { it }
+        number = counterpartySession.receive<View>().unwrap { it }
 
+        val number1 : Int
 
-        number = number+ 1
+        number1 = number.number + 1
 
-        counterpartySession.send(number);
+        counterpartySession.send(number1);
 
         val signedTransactionFlow = object : SignTransactionFlow(counterpartySession) {
             override fun checkTransaction(stx: SignedTransaction) = requireThat {
