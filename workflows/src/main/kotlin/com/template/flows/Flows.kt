@@ -1,6 +1,7 @@
 package com.template.flows
 
 import co.paralleluniverse.fibers.Suspendable
+import com.template.contracts.CommericalPaper
 import net.corda.core.contracts.*
 import net.corda.core.flows.*
 import net.corda.core.identity.PartyAndCertificate
@@ -28,7 +29,7 @@ class View(
 // *********
 @InitiatingFlow
 @StartableByRPC
-class Initiator(var party1 : Party, var number: Int) : FlowLogic<Int>() {
+class Initiator(var party1 : Party, var number: Int, var name: String) : FlowLogic<Int>() {
 
 
     override val progressTracker = ProgressTracker()
@@ -69,6 +70,7 @@ class Responder(val counterpartySession: FlowSession) : FlowLogic<SignedTransact
         number1 = number.number + 1
 
         counterpartySession.send(number1);
+
 
         val signedTransactionFlow = object : SignTransactionFlow(counterpartySession) {
             override fun checkTransaction(stx: SignedTransaction) = requireThat {
